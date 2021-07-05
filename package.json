@@ -1,0 +1,24 @@
+{
+    "name": "john-scraping-framework",
+    "version": "1.0.1",
+    "description": "",
+    "main": ".",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/hayomide/LinkedIn-lead-Scrapper.git"
+    },
+    "author": "John Eniola",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/hayomide/LinkedIn-lead-Scrapper/issues"
+    },
+    "homepage": "https://github.com/hayomide/LinkedIn-lead-Scrapper.git#readme",
+    "dependencies": {
+        "dotenv": "^10.0.0",
+        "spider-core": "^1.0.8"
+    },
+    "devDependencies": {
+        "eslint": "^7.27.0",
+        "prettier": "^2.3.0"
+    }
+}
