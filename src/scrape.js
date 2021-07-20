@@ -1,6 +1,5 @@
 /* scrape */
-const { Console } = require("console");
-const { join, isAbsolute } = require("path");
+const { join } = require("path");
 
 const { launchBrowser } = require("spider-core");
 const { executablePath, headless, linkedInAccountUsername, linkedInAccountPassword } = require("../config");
@@ -92,7 +91,11 @@ const visitPage = async (keyword) => {
     }
 
     const isSignedIN = await signIn();
-    if (!isSignedIN) return console.error("Error to SignIn!!!");
+    if (!isSignedIN) {
+        console.error("Error to SignIn!!!");
+        await exitBrowser();
+        return false;
+    }
 
     try {
         console.log(`Searching for ${keyword} profiles...`);
