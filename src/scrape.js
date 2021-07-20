@@ -1,4 +1,6 @@
 /* scrape */
+const { Console } = require("console");
+const { sign } = require("crypto");
 const { join } = require("path");
 
 const { launchBrowser } = require("spider-core");
@@ -8,9 +10,14 @@ const proxiesFile = join(__dirname, "../proxies.txt");
 
 const signIn = async (page) => {
     console.log("Trying to login ...");
-    if (!linkedInAccountUsername || !linkedInAccountPassword) {
-        console.error("LinkedIn login credentials not well provided");
-        return;
+    if (!linkedInAccountUsername || typeof linkedInAccountUsername !== "string" || linkedInAccountUsername.length < 1) {
+        console.error("LinkedIn login Username not well provided");
+        return false;
+    }
+
+    if (!linkedInAccountPassword || typeof linkedInAccountPassword !== "string" || linkedInAccountPassword.length < 1) {
+        console.error("LinkedIn login password not well provided");
+        return false;
     }
 
     try {
@@ -21,7 +28,7 @@ const signIn = async (page) => {
         await page.keyboard.press("Tab");
     } catch (e) {
         console.error("Unable to input LinkedIn username!", e);
-        return;
+        return false;
     }
 
     try {
@@ -32,7 +39,7 @@ const signIn = async (page) => {
         await page.waitForTimeout(20);
     } catch (e) {
         console.error("Unable to input LinkedIn passowrd!", e);
-        return;
+        return false;
     }
 
     // CLick Login  button
@@ -41,8 +48,10 @@ const signIn = async (page) => {
         await page.waitForNavigation({ waitUntil: "networkidle0" });
         console.log("Login Successful..");
         await page.waitForTimeout(20000);
+        return true;
     } catch (e) {
         console.error("Unable to login", e);
+        return false;
     }
 };
 
@@ -69,10 +78,14 @@ const visitPage = async (keyword) => {
     }
 
     try {
-        await page.waitForSelector('[name="session_key"]');
-        await signIn(page);
-    } catch (e) {
+        console.log("Checking if signed In....");
+        await page.waitForSelector("#ember102");
         console.error("Already signin!");
+    } catch (e) {
+        console.error("Not Signed IN");
+        const isSignedIN = await signIn();
+        if (!isSignedIN) return Console.error("Error to SignIn!!!");
+        await signIn(page);
     }
 
     try {
