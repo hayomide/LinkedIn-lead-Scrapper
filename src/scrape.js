@@ -1,7 +1,6 @@
 /* scrape */
 const { Console } = require("console");
-const { sign } = require("crypto");
-const { join } = require("path");
+const { join, isAbsolute } = require("path");
 
 const { launchBrowser } = require("spider-core");
 const { executablePath, headless, linkedInAccountUsername, linkedInAccountPassword } = require("../config");
@@ -47,8 +46,7 @@ const signIn = async (page) => {
         await page.click('button[type="submit"]');
         await page.waitForNavigation({ waitUntil: "networkidle0" });
         console.log("Login Successful..");
-        await page.waitForTimeout(20000);
-        return true;
+        await page.waitForTimeout(2000);
     } catch (e) {
         console.error("Unable to login", e);
         return false;
@@ -70,23 +68,31 @@ const visitPage = async (keyword) => {
     const url = "https://www.linkedin.com/";
     try {
         console.log(`Opening ${url} ...\n`);
-        await page.goto(url, { waitUntil: "networkidle0", timeout: 20000 });
+        await page.goto(url, { waitUntil: "networkidle0", timeout: 10000 });
     } catch (err) {
         console.error("Unable to open url", err);
         await exitBrowser();
         return;
     }
 
-    try {
-        console.log("Checking if signed In....");
-        await page.waitForSelector("#ember102");
-        console.error("Already signin!");
-    } catch (e) {
-        console.error("Not Signed IN");
-        const isSignedIN = await signIn();
-        if (!isSignedIN) return Console.error("Error to SignIn!!!");
+    console.log("Checking if signed In....\n");
+    const isAccountSel = async () => {
+        try {
+            await page.waitForSelector("#ember102");
+        } catch (e) {
+            return false;
+        }
+    };
+
+    if (!isAccountSel) {
+        console.log("Already signin!");
+    } else {
+        console.error("Not Signed in");
         await signIn(page);
     }
+
+    const isSignedIN = await signIn();
+    if (!isSignedIN) return console.error("Error to SignIn!!!");
 
     try {
         console.log(`Searching for ${keyword} profiles...`);
